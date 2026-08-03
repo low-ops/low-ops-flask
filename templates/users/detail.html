@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Person{% endblock %}
+
+{% block content %}
+<a class="back-link" href="/">
+  <span aria-hidden="true">←</span> Back to people
+</a>
+
+<article class="detail" id="detail" data-user-id="{{ user_id }}">
+  <div id="detail-loading" class="loading-state">Loading person…</div>
+
+  <div id="detail-content" class="detail-content hidden">
+    <header class="detail-hero">
+      <div class="avatar-editor">
+        <button type="button" class="avatar-button" id="avatar-button" aria-label="Change photo">
+          <img id="avatar-image" class="avatar-image hidden" alt="">
+          <span id="avatar-fallback" class="avatar-fallback"></span>
+          <span class="avatar-overlay">Change photo</span>
+        </button>
+        <input type="file" id="avatar-input" accept="image/*" hidden>
+        <p class="avatar-hint" id="avatar-hint">JPG, PNG, or WebP</p>
+      </div>
+
+      <div class="detail-intro">
+        <p class="eyebrow">Profile</p>
+        <h1 class="detail-name" id="detail-name"></h1>
+        <p class="detail-email" id="detail-email"></p>
+      </div>
+    </header>
+
+    <form class="detail-form" id="detail-form">
+      <div class="field-stack">
+        <label class="field">
+          <span>Name</span>
+          <input name="name" id="input-name" required maxlength="150">
+        </label>
+        <label class="field">
+          <span>Email</span>
+          <input name="email" id="input-email" type="email" required>
+        </label>
+      </div>
+
+      <div class="detail-actions">
+        <button type="submit" class="btn btn-primary" id="save-btn">Save changes</button>
+        <button type="button" class="btn btn-danger" id="delete-btn">Delete person</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="detail-error" class="empty-state hidden">
+    <h3>Person not found</h3>
+    <p>They may have been removed. Head back to the list.</p>
+    <a class="btn btn-primary" href="/">View people</a>
+  </div>
+</article>
+
+<dialog class="sheet" id="delete-sheet" aria-labelledby="delete-title">
+  <form method="dialog" class="sheet-card sheet-card-narrow">
+    <header class="sheet-header">
+      <div>
+        <p class="eyebrow">Confirm</p>
+        <h2 id="delete-title">Delete this person?</h2>
+      </div>
+    </header>
+    <p class="sheet-copy">This removes them from the local mock list. You can’t undo it.</p>
+    <footer class="sheet-actions">
+      <button type="submit" class="btn btn-ghost" value="cancel">Keep person</button>
+      <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
+    </footer>
+  </form>
+</dialog>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => PeopleApp.initDetail());
+</script>
+{% endblock %}
