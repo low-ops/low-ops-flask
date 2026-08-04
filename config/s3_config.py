@@ -102,7 +102,7 @@ def resolve_s3_config():
         'prefix': bucket_parts['prefix'],
         'endpoint': endpoint,
         'region': region,
-        'force_path_style': 'amazonaws.com' not in endpoint,
+        'force_path_style': True,
         'perform_delete': parse_boolean_env(os.environ.get('S3_PERFORM_DELETE')),
         'service_name': (os.environ.get('S3_SERVICE_NAME') or 's3').strip() or 's3',
     }

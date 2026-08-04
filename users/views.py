@@ -3,6 +3,7 @@ from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 from config.database import db
+from config.metrics import USERS_CREATED_TOTAL
 from . import store
 from .avatars import load_avatar_payload, save_avatar
 from .serializers import UserSchema, load_user_payload
@@ -66,6 +67,7 @@ def create_user():
         db.session.rollback()
         return jsonify({'email': ['user with this email already exists.']}), 400
 
+    USERS_CREATED_TOTAL.inc()
     return jsonify(UserSchema().dump(_public_payload(user))), 201
 
 

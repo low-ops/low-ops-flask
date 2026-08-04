@@ -5,12 +5,25 @@
   <img src="./images/flask-logo.svg" height="50" width="60" alt="Flask logo" style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1)"/>
 </p>
 
-This template is a simple Flask project with a basic structure.
+People desk starter: Flask, PostgreSQL, and S3-compatible storage.
 
-## Getting Started
-
-Clone the repository and start developing your Flask app:
+## Local development
 
 ```bash
-git clone {repository-url}
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+flask --app app run --host 0.0.0.0 --port 8000
 ```
+
+## Docker
+
+```bash
+docker compose up --build
+```
+
+- App: `PORT` (default `8000`), health `GET /ready`
+- Metrics: `METRICS_PORT` (default `8001`) Prometheus `/metrics`
+- OpenAPI schema: `/api/schema`
+- Compose includes PostgreSQL and MinIO

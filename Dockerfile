@@ -10,9 +10,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
-RUN chmod +x entrypoint.sh
+RUN chmod +x entrypoint.sh \
+    && python -c "import compileall; compileall.compile_dir('.', quiet=1)"
 
-EXPOSE 8000
+ENV PORT=8000
+ENV METRICS_PORT=8001
+EXPOSE 8000 8001
 
 ENTRYPOINT ["./entrypoint.sh"]
-CMD ["gunicorn", "wsgi:application", "--bind", "0.0.0.0:8000"]

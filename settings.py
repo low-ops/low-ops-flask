@@ -7,3 +7,5 @@ DEBUG = os.environ.get('DEBUG', 'true').lower() in {'1', 'true', 'yes', 'on'}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+APPLICATION_URL = (os.environ.get('APPLICATION_URL') or '').strip().rstrip('/')
