@@ -34,12 +34,15 @@ def _validated_user_data(payload, user_id=None, previous_key=None):
 
 
 def _public_payload(user):
-    return {
+    payload = {
         'id': user['id'],
         'name': user['name'],
         'email': user['email'],
         'avatar': user.get('avatar'),
     }
+    if user.get('updated_at'):
+        payload['updated_at'] = user['updated_at']
+    return payload
 
 
 def _validation_error_response(exc):
@@ -150,7 +153,8 @@ def user_avatar(user_id):
         return jsonify({'detail': 'Not found.'}), 404
 
     response = Response(payload['body'], mimetype=payload['content_type'])
-    response.headers['Cache-Control'] = 'private, max-age=300'
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
     if payload.get('content_length') is not None:
         response.headers['Content-Length'] = str(payload['content_length'])
     return response

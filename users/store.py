@@ -1,5 +1,6 @@
 import logging
 from copy import deepcopy
+from datetime import datetime, timezone
 from itertools import count
 from threading import Lock
 
@@ -11,6 +12,11 @@ logger = logging.getLogger('lowops.users')
 _id_counter = count(4)
 _lock = Lock()
 
+
+def _utcnow_iso():
+    return datetime.now(timezone.utc).isoformat()
+
+
 _USERS = {
     1: {
         'id': 1,
@@ -18,6 +24,7 @@ _USERS = {
         'email': 'alice@example.com',
         'avatar': None,
         'avatar_key': None,
+        'updated_at': _utcnow_iso(),
     },
     2: {
         'id': 2,
@@ -25,6 +32,7 @@ _USERS = {
         'email': 'bob@example.com',
         'avatar': None,
         'avatar_key': None,
+        'updated_at': _utcnow_iso(),
     },
     3: {
         'id': 3,
@@ -32,6 +40,7 @@ _USERS = {
         'email': 'carol@example.com',
         'avatar': None,
         'avatar_key': None,
+        'updated_at': _utcnow_iso(),
     },
 }
 
@@ -58,6 +67,7 @@ def _serialize_db_user(user):
         'email': user.email,
         'avatar': avatar,
         'avatar_key': user.avatar_key,
+        'updated_at': user.updated_at.isoformat() if user.updated_at else None,
     }
 
 
@@ -70,6 +80,8 @@ def _public_user(user):
     }
     if user.get('avatar_key'):
         data['avatar'] = f"/api/users/{user['id']}/avatar/"
+    if user.get('updated_at'):
+        data['updated_at'] = user['updated_at']
     return data
 
 
@@ -96,6 +108,7 @@ def get_user(user_id, include_private=False):
             'name': data['name'],
             'email': data['email'],
             'avatar': data['avatar'],
+            'updated_at': data.get('updated_at'),
         }
 
     with _lock:
@@ -137,6 +150,7 @@ def create_user(data):
             'email': data['email'],
             'avatar': data.get('avatar'),
             'avatar_key': data.get('avatar_key'),
+            'updated_at': _utcnow_iso(),
         }
         if data.get('_pending_upload') is not None:
             from .avatars import save_avatar
@@ -144,6 +158,7 @@ def create_user(data):
             saved = save_avatar(data['_pending_upload'], user_id)
             user['avatar'] = saved['avatar']
             user['avatar_key'] = saved['avatar_key']
+            user['updated_at'] = _utcnow_iso()
         _USERS[user_id] = user
         return _public_user(user)
 
@@ -180,6 +195,7 @@ def update_user(user_id, data, partial=False):
             for key, value in data.items():
                 if key in {'name', 'email', 'avatar', 'avatar_key'}:
                     user[key] = value
+            user['updated_at'] = _utcnow_iso()
         else:
             user['name'] = data['name']
             user['email'] = data['email']
@@ -187,6 +203,7 @@ def update_user(user_id, data, partial=False):
                 user['avatar'] = data.get('avatar')
             if 'avatar_key' in data:
                 user['avatar_key'] = data.get('avatar_key')
+            user['updated_at'] = _utcnow_iso()
 
         return _public_user(user)
 

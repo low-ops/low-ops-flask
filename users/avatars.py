@@ -23,7 +23,7 @@ def _extension(uploaded_file):
 
 
 def _read_bytes(uploaded_file):
-    uploaded_file.stream.seek(0)
+    uploaded_file.seek(0)
     return uploaded_file.read()
 
 

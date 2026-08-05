@@ -1,5 +1,6 @@
 from marshmallow import Schema, fields, validate, EXCLUDE, ValidationError
 from PIL import Image, UnidentifiedImageError
+import os
 
 
 ALLOWED_IMAGE_TYPES = {
@@ -18,6 +19,7 @@ class UserSchema(Schema):
     name = fields.Str(required=True, validate=validate.Length(min=1, max=150))
     email = fields.Email(required=True)
     avatar = fields.Str(load_default=None, allow_none=True)
+    updated_at = fields.Str(dump_only=True, allow_none=True)
 
 
 def validate_avatar_file(uploaded_file):
@@ -28,19 +30,32 @@ def validate_avatar_file(uploaded_file):
     if not filename:
         return None
 
+    uploaded_file.seek(0, os.SEEK_END)
+    if uploaded_file.tell() == 0:
+        uploaded_file.seek(0)
+        return None
+    uploaded_file.seek(0)
+
     content_type = getattr(uploaded_file, 'content_type', '') or ''
     if content_type and content_type not in ALLOWED_IMAGE_TYPES:
-        raise ValidationError({'avatar_file': ['Upload a valid image.']})
+        raise ValidationError({
+            'avatar_file': [
+                'Upload a valid image. The file you uploaded was either not an image or a corrupted image.'
+            ]
+        })
 
-    stream = uploaded_file.stream
-    pos = stream.tell()
     try:
-        image = Image.open(stream)
+        uploaded_file.seek(0)
+        image = Image.open(uploaded_file.stream)
         image.verify()
-    except (UnidentifiedImageError, OSError) as exc:
-        raise ValidationError({'avatar_file': ['Upload a valid image.']}) from exc
+    except (UnidentifiedImageError, OSError, SyntaxError, ValueError) as exc:
+        raise ValidationError({
+            'avatar_file': [
+                'Upload a valid image. The file you uploaded was either not an image or a corrupted image.'
+            ]
+        }) from exc
     finally:
-        stream.seek(pos)
+        uploaded_file.seek(0)
 
     return uploaded_file
 

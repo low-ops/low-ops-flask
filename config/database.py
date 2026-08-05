@@ -72,3 +72,23 @@ def init_database(app):
             exc,
         )
         return False
+
+
+def seed_demo_users():
+    if not _database_available:
+        return
+
+    from users.models import User
+
+    if User.query.first() is not None:
+        return
+
+    demo_users = (
+        ('Alice Johnson', 'alice@example.com'),
+        ('Bob Smith', 'bob@example.com'),
+        ('Carol Lee', 'carol@example.com'),
+    )
+    for name, email in demo_users:
+        db.session.add(User(name=name, email=email))
+    db.session.commit()
+    logger.info('Seeded demo users in PostgreSQL')

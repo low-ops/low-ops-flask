@@ -42,9 +42,16 @@ const PeopleApp = (() => {
     return data;
   }
 
+  function avatarSrc(avatar, updatedAt) {
+    if (!avatar) return '';
+    if (!updatedAt) return avatar;
+    const joiner = avatar.includes('?') ? '&' : '?';
+    return `${avatar}${joiner}v=${encodeURIComponent(updatedAt)}`;
+  }
+
   function avatarMarkup(user, className = 'avatar') {
     if (user.avatar) {
-      return `<img class="${className}" src="${user.avatar}" alt="">`;
+      return `<img class="${className}" src="${avatarSrc(user.avatar, user.updated_at)}" alt="">`;
     }
     return `<span class="avatar-fallback ${className}">${initials(user.name)}</span>`;
   }
@@ -184,7 +191,7 @@ const PeopleApp = (() => {
       document.title = `${user.name} · Low-Ops`;
 
       if (user.avatar) {
-        avatarImage.src = user.avatar;
+        avatarImage.src = avatarSrc(user.avatar, user.updated_at);
         avatarImage.alt = `${user.name} photo`;
         avatarImage.classList.remove('hidden');
         avatarFallback.classList.add('hidden');

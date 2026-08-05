@@ -5,7 +5,7 @@ PORT="${PORT:-8000}"
 
 if [ -n "$POSTGRES_HOST" ] && [ -n "$POSTGRES_DATABASE" ] && [ -n "$POSTGRES_USER" ] && [ -n "$POSTGRES_PASSWORD" ]; then
   echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"level\":\"info\",\"message\":\"Attempting database migrations\"}"
-  if python -c "from app import create_app; from config.database import db; from users import models; app = create_app(); app.app_context().push(); db.create_all(); print('ok')"; then
+  if python -c "from app import create_app; from config.database import db, seed_demo_users; from users import models; app = create_app(); app.app_context().push(); db.create_all(); seed_demo_users(); print('ok')"; then
     echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"level\":\"info\",\"message\":\"Database migrations complete\"}"
   else
     echo "{\"timestamp\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",\"level\":\"warn\",\"message\":\"Database migrations failed. Continuing with available fallback\"}"
