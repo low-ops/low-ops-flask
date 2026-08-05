@@ -10,10 +10,8 @@ People desk starter: Flask, PostgreSQL, and S3-compatible storage.
 ## Local development
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
 cp .env.example .env
+pip install -r requirements.txt
 flask --app app run --host 0.0.0.0 --port 8000
 ```
 
